@@ -1,39 +1,48 @@
-name: Deploy on Render
+# Your workflow name.
+name: Deploy to heroku.
 
-
+# Run workflow on every push to main branch.
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
+# Your workflows jobs.
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      # Check-out your repository.
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+### ⬇ IMPORTANT PART ⬇ ###
 
-
-  # Heavily modified deploy job to fit render.com
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps: 
       - name: Deploy to production
         uses: johnbeynon/render-deploy-action@v0.0.8
         with:
           service-id: ${{ secrets.SERVICE_ID }} # Can be found as part of the Deploy Hook
-          api-key: ${{ secrets.RENDER_API_KEY }} # Create your API key in Render Dashboard > Account Settings
+          api-key: ${{ secrets.RENDER_API_KEY }}
 
+          # (Optional, default: "./")
+          # Dockerfile directory.
+          # For example, if you have a Dockerfile in the root of your project, leave it as follows:
+          dockerfile_directory: ./
 
-          https://api.render.com/deploy/srv-cjt978lhtt0c73b104d0?key=BodU0xI3RIc
+          # (Optional, default: "Dockerfile")
+          # Dockerfile name.
+          dockerfile_name: Dockerfile
+
+          # (Optional, default: "")
+          # Additional options of docker build command.
+          docker_options: "--no-cache"
+
+          # (Optional, default: "web")
+          # Select the process type for which you want the docker container to be uploaded.
+          # By default, this argument is set to "web".
+          # For more information look at https://devcenter.heroku.com/articles/process-model
+          process_type: web
+          
+   
+          
+### ⬆ IMPORTANT PART ⬆ ###
